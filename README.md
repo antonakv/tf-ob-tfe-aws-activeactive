@@ -25,13 +25,13 @@ This manual is dedicated to install Prod External Services ( Redis + S3 + DB ) a
 - Clone git repository
 
 ```bash
-git clone https://github.com/antonakv/tfe-aws-online-s3db.git
+git clone git@github.com:antonakv/tf-ob-tfe-aws-activeactive.git
 ```
 
 Expected command output looks like this:
 
 ```bash
-Cloning into 'tfe-aws-online-s3db'...
+Cloning into 'tf-ob-tfe-aws-activeactive'...
 remote: Enumerating objects: 12, done.
 remote: Counting objects: 100% (12/12), done.
 remote: Compressing objects: 100% (12/12), done.
@@ -40,10 +40,10 @@ Receiving objects: 100% (12/12), done.
 Resolving deltas: 100% (1/1), done.
 ```
 
-- Change folder to tfe-aws-online-s3db
+- Change folder to tf-ob-tfe-aws-activeactive
 
 ```bash
-cd tfe-aws-online-s3db
+cd tf-ob-tfe-aws-activeactive
 ```
 
 - Create file testing.tfvars with following contents
@@ -130,9 +130,9 @@ Terraform used the selected providers to generate the following execution plan. 
 
 Terraform will perform the following actions:
 
-  # data.template_cloudinit_config.aws7_cloudinit will be read during apply
+  # data.template_cloudinit_config.aws10_cloudinit will be read during apply
   # (config refers to values not yet known)
- <= data "template_cloudinit_config" "aws7_cloudinit"  {
+ <= data "template_cloudinit_config" "aws10_cloudinit"  {
       + base64_encode = true
       + gzip          = true
       + id            = (known after apply)
@@ -286,7 +286,7 @@ Terraform will perform the following actions:
             echo "#!/usr/bin/env bash
             chmod 600 /home/ubuntu/install/server.key
             cd /home/ubuntu/install
-            aws s3 cp s3://aakulov-aws7-tfe-tfe . --recursive
+            aws s3 cp s3://aakulov-aws10-tfe-tfe . --recursive
             curl -# -o /home/ubuntu/install/install.sh https://install.terraform.io/ptfe/stable
             chmod +x install.sh
             sudo rm -rf /usr/share/keyrings/docker-archive-keyring.gpg
@@ -304,18 +304,18 @@ Terraform will perform the following actions:
       + vars     = {
           + "cert_pem"      = (known after apply)
           + "enc_password"  = (sensitive)
-          + "hostname"      = "tfe7.anton.hashicorp-success.com"
+          + "hostname"      = "tfe10.anton.hashicorp-success.com"
           + "key_pem"       = (sensitive)
           + "pgsqlhostname" = (known after apply)
           + "pgsqlpassword" = (sensitive)
           + "pguser"        = "postgres"
-          + "s3bucket"      = "aakulov-aws7-tfe-data"
+          + "s3bucket"      = "aakulov-aws10-tfe-data"
           + "s3region"      = "eu-central-1"
         }
     }
 
-  # aws_db_instance.aws7 will be created
-  + resource "aws_db_instance" "aws7" {
+  # aws_db_instance.aws10 will be created
+  + resource "aws_db_instance" "aws10" {
       + address                               = (known after apply)
       + allocated_storage                     = 20
       + apply_immediately                     = (known after apply)
@@ -327,7 +327,7 @@ Terraform will perform the following actions:
       + ca_cert_identifier                    = (known after apply)
       + character_set_name                    = (known after apply)
       + copy_tags_to_snapshot                 = false
-      + db_subnet_group_name                  = "aakulov-aws7"
+      + db_subnet_group_name                  = "aakulov-aws10"
       + delete_automated_backups              = true
       + endpoint                              = (known after apply)
       + engine                                = "postgres"
@@ -363,34 +363,34 @@ Terraform will perform the following actions:
       + status                                = (known after apply)
       + storage_type                          = (known after apply)
       + tags                                  = {
-          + "Name" = "aakulov-aws7"
+          + "Name" = "aakulov-aws10"
         }
       + tags_all                              = {
-          + "Name" = "aakulov-aws7"
+          + "Name" = "aakulov-aws10"
         }
       + timezone                              = (known after apply)
       + username                              = "postgres"
       + vpc_security_group_ids                = (known after apply)
     }
 
-  # aws_db_subnet_group.aws7 will be created
-  + resource "aws_db_subnet_group" "aws7" {
+  # aws_db_subnet_group.aws10 will be created
+  + resource "aws_db_subnet_group" "aws10" {
       + arn         = (known after apply)
       + description = "Managed by Terraform"
       + id          = (known after apply)
-      + name        = "aakulov-aws7"
+      + name        = "aakulov-aws10"
       + name_prefix = (known after apply)
       + subnet_ids  = (known after apply)
       + tags        = {
-          + "Name" = "aakulov-aws7"
+          + "Name" = "aakulov-aws10"
         }
       + tags_all    = {
-          + "Name" = "aakulov-aws7"
+          + "Name" = "aakulov-aws10"
         }
     }
 
-  # aws_eip.aws7 will be created
-  + resource "aws_eip" "aws7" {
+  # aws_eip.aws10 will be created
+  + resource "aws_eip" "aws10" {
       + allocation_id        = (known after apply)
       + association_id       = (known after apply)
       + carrier_ip           = (known after apply)
@@ -409,20 +409,20 @@ Terraform will perform the following actions:
       + vpc                  = true
     }
 
-  # aws_iam_instance_profile.aakulov-aws7-ec2-s3 will be created
-  + resource "aws_iam_instance_profile" "aakulov-aws7-ec2-s3" {
+  # aws_iam_instance_profile.aakulov-aws10-ec2-s3 will be created
+  + resource "aws_iam_instance_profile" "aakulov-aws10-ec2-s3" {
       + arn         = (known after apply)
       + create_date = (known after apply)
       + id          = (known after apply)
-      + name        = "aakulov-aws7-ec2-s3"
+      + name        = "aakulov-aws10-ec2-s3"
       + path        = "/"
-      + role        = "aakulov-aws7-iam-role-ec2-s3"
+      + role        = "aakulov-aws10-iam-role-ec2-s3"
       + tags_all    = (known after apply)
       + unique_id   = (known after apply)
     }
 
-  # aws_iam_role.aakulov-aws7-iam-role-ec2-s3 will be created
-  + resource "aws_iam_role" "aakulov-aws7-iam-role-ec2-s3" {
+  # aws_iam_role.aakulov-aws10-iam-role-ec2-s3 will be created
+  + resource "aws_iam_role" "aakulov-aws10-iam-role-ec2-s3" {
       + arn                   = (known after apply)
       + assume_role_policy    = jsonencode(
             {
@@ -444,14 +444,14 @@ Terraform will perform the following actions:
       + id                    = (known after apply)
       + managed_policy_arns   = (known after apply)
       + max_session_duration  = 3600
-      + name                  = "aakulov-aws7-iam-role-ec2-s3"
+      + name                  = "aakulov-aws10-iam-role-ec2-s3"
       + name_prefix           = (known after apply)
       + path                  = "/"
       + tags                  = {
-          + "tag-key" = "aakulov-aws7-iam-role-ec2-s3"
+          + "tag-key" = "aakulov-aws10-iam-role-ec2-s3"
         }
       + tags_all              = {
-          + "tag-key" = "aakulov-aws7-iam-role-ec2-s3"
+          + "tag-key" = "aakulov-aws10-iam-role-ec2-s3"
         }
       + unique_id             = (known after apply)
 
@@ -461,16 +461,16 @@ Terraform will perform the following actions:
         }
     }
 
-  # aws_iam_role_policy.aakulov-aws7-ec2-s3 will be created
-  + resource "aws_iam_role_policy" "aakulov-aws7-ec2-s3" {
+  # aws_iam_role_policy.aakulov-aws10-ec2-s3 will be created
+  + resource "aws_iam_role_policy" "aakulov-aws10-ec2-s3" {
       + id     = (known after apply)
-      + name   = "aakulov-aws7-ec2-s3"
+      + name   = "aakulov-aws10-ec2-s3"
       + policy = (known after apply)
       + role   = (known after apply)
     }
 
-  # aws_instance.aws7 will be created
-  + resource "aws_instance" "aws7" {
+  # aws_instance.aws10 will be created
+  + resource "aws_instance" "aws10" {
       + ami                                  = "ami-086128e34136c3375"
       + arn                                  = (known after apply)
       + associate_public_ip_address          = true
@@ -504,10 +504,10 @@ Terraform will perform the following actions:
       + source_dest_check                    = true
       + subnet_id                            = (known after apply)
       + tags                                 = {
-          + "Name" = "aakulov-aws7"
+          + "Name" = "aakulov-aws10"
         }
       + tags_all                             = {
-          + "Name" = "aakulov-aws7"
+          + "Name" = "aakulov-aws10"
         }
       + tenancy                              = (known after apply)
       + user_data                            = (known after apply)
@@ -578,10 +578,10 @@ Terraform will perform the following actions:
       + id       = (known after apply)
       + owner_id = (known after apply)
       + tags     = {
-          + "Name" = "aakulov-aws7"
+          + "Name" = "aakulov-aws10"
         }
       + tags_all = {
-          + "Name" = "aakulov-aws7"
+          + "Name" = "aakulov-aws10"
         }
       + vpc_id   = (known after apply)
     }
@@ -596,27 +596,27 @@ Terraform will perform the following actions:
       + public_ip            = (known after apply)
       + subnet_id            = (known after apply)
       + tags                 = {
-          + "Name" = "aakulov-aws7"
+          + "Name" = "aakulov-aws10"
         }
       + tags_all             = {
-          + "Name" = "aakulov-aws7"
+          + "Name" = "aakulov-aws10"
         }
     }
 
-  # aws_route53_record.aws7 will be created
-  + resource "aws_route53_record" "aws7" {
+  # aws_route53_record.aws10 will be created
+  + resource "aws_route53_record" "aws10" {
       + allow_overwrite = true
       + fqdn            = (known after apply)
       + id              = (known after apply)
-      + name            = "tfe7.anton.hashicorp-success.com"
+      + name            = "tfe10.anton.hashicorp-success.com"
       + records         = (known after apply)
       + ttl             = 300
       + type            = "A"
       + zone_id         = "Z077919913NMEBCGB4WS0"
     }
 
-  # aws_route_table.aws7-private will be created
-  + resource "aws_route_table" "aws7-private" {
+  # aws_route_table.aws10-private will be created
+  + resource "aws_route_table" "aws10-private" {
       + arn              = (known after apply)
       + id               = (known after apply)
       + owner_id         = (known after apply)
@@ -639,16 +639,16 @@ Terraform will perform the following actions:
             },
         ]
       + tags             = {
-          + "Name" = "aakulov-aws7-private"
+          + "Name" = "aakulov-aws10-private"
         }
       + tags_all         = {
-          + "Name" = "aakulov-aws7-private"
+          + "Name" = "aakulov-aws10-private"
         }
       + vpc_id           = (known after apply)
     }
 
-  # aws_route_table.aws7-public will be created
-  + resource "aws_route_table" "aws7-public" {
+  # aws_route_table.aws10-public will be created
+  + resource "aws_route_table" "aws10-public" {
       + arn              = (known after apply)
       + id               = (known after apply)
       + owner_id         = (known after apply)
@@ -671,34 +671,34 @@ Terraform will perform the following actions:
             },
         ]
       + tags             = {
-          + "Name" = "aakulov-aws7-public"
+          + "Name" = "aakulov-aws10-public"
         }
       + tags_all         = {
-          + "Name" = "aakulov-aws7-public"
+          + "Name" = "aakulov-aws10-public"
         }
       + vpc_id           = (known after apply)
     }
 
-  # aws_route_table_association.aws7-private will be created
-  + resource "aws_route_table_association" "aws7-private" {
+  # aws_route_table_association.aws10-private will be created
+  + resource "aws_route_table_association" "aws10-private" {
       + id             = (known after apply)
       + route_table_id = (known after apply)
       + subnet_id      = (known after apply)
     }
 
-  # aws_route_table_association.aws7-public will be created
-  + resource "aws_route_table_association" "aws7-public" {
+  # aws_route_table_association.aws10-public will be created
+  + resource "aws_route_table_association" "aws10-public" {
       + id             = (known after apply)
       + route_table_id = (known after apply)
       + subnet_id      = (known after apply)
     }
 
-  # aws_s3_bucket.aws7 will be created
-  + resource "aws_s3_bucket" "aws7" {
+  # aws_s3_bucket.aws10 will be created
+  + resource "aws_s3_bucket" "aws10" {
       + acceleration_status         = (known after apply)
       + acl                         = "private"
       + arn                         = (known after apply)
-      + bucket                      = "aakulov-aws7-tfe-data"
+      + bucket                      = "aakulov-aws10-tfe-data"
       + bucket_domain_name          = (known after apply)
       + bucket_regional_domain_name = (known after apply)
       + force_destroy               = true
@@ -707,10 +707,10 @@ Terraform will perform the following actions:
       + region                      = (known after apply)
       + request_payer               = (known after apply)
       + tags                        = {
-          + "Name" = "aakulov-aws7-tfe-data"
+          + "Name" = "aakulov-aws10-tfe-data"
         }
       + tags_all                    = {
-          + "Name" = "aakulov-aws7-tfe-data"
+          + "Name" = "aakulov-aws10-tfe-data"
         }
       + website_domain              = (known after apply)
       + website_endpoint            = (known after apply)
@@ -721,8 +721,8 @@ Terraform will perform the following actions:
         }
     }
 
-  # aws_s3_bucket_public_access_block.aws7 will be created
-  + resource "aws_s3_bucket_public_access_block" "aws7" {
+  # aws_s3_bucket_public_access_block.aws10 will be created
+  + resource "aws_s3_bucket_public_access_block" "aws10" {
       + block_public_acls       = true
       + block_public_policy     = true
       + bucket                  = (known after apply)
@@ -731,8 +731,8 @@ Terraform will perform the following actions:
       + restrict_public_buckets = true
     }
 
-  # aws_security_group.aakulov-aws7 will be created
-  + resource "aws_security_group" "aakulov-aws7" {
+  # aws_security_group.aakulov-aws10 will be created
+  + resource "aws_security_group" "aakulov-aws10" {
       + arn                    = (known after apply)
       + description            = "Managed by Terraform"
       + egress                 = [
@@ -816,21 +816,21 @@ Terraform will perform the following actions:
               + to_port          = 5432
             },
         ]
-      + name                   = "aakulov-aws7-sg"
+      + name                   = "aakulov-aws10-sg"
       + name_prefix            = (known after apply)
       + owner_id               = (known after apply)
       + revoke_rules_on_delete = false
       + tags                   = {
-          + "Name" = "aakulov-aws7-sg"
+          + "Name" = "aakulov-aws10-sg"
         }
       + tags_all               = {
-          + "Name" = "aakulov-aws7-sg"
+          + "Name" = "aakulov-aws10-sg"
         }
       + vpc_id                 = (known after apply)
     }
 
-  # aws_security_group.aws7-internal-sg will be created
-  + resource "aws_security_group" "aws7-internal-sg" {
+  # aws_security_group.aws10-internal-sg will be created
+  + resource "aws_security_group" "aws10-internal-sg" {
       + arn                    = (known after apply)
       + description            = "Managed by Terraform"
       + egress                 = [
@@ -890,15 +890,15 @@ Terraform will perform the following actions:
               + to_port          = 443
             },
         ]
-      + name                   = "aakulov-aws7-internal-sg"
+      + name                   = "aakulov-aws10-internal-sg"
       + name_prefix            = (known after apply)
       + owner_id               = (known after apply)
       + revoke_rules_on_delete = false
       + tags                   = {
-          + "Name" = "aakulov-aws7-internal-sg"
+          + "Name" = "aakulov-aws10-internal-sg"
         }
       + tags_all               = {
-          + "Name" = "aakulov-aws7-internal-sg"
+          + "Name" = "aakulov-aws10-internal-sg"
         }
       + vpc_id                 = (known after apply)
     }
@@ -983,15 +983,15 @@ Terraform will perform the following actions:
       + main_route_table_id              = (known after apply)
       + owner_id                         = (known after apply)
       + tags                             = {
-          + "Name" = "aakulov-aws7"
+          + "Name" = "aakulov-aws10"
         }
       + tags_all                         = {
-          + "Name" = "aakulov-aws7"
+          + "Name" = "aakulov-aws10"
         }
     }
 
-  # tls_private_key.aws7 will be created
-  + resource "tls_private_key" "aws7" {
+  # tls_private_key.aws10 will be created
+  + resource "tls_private_key" "aws10" {
       + algorithm                  = "RSA"
       + ecdsa_curve                = "P224"
       + id                         = (known after apply)
@@ -1002,8 +1002,8 @@ Terraform will perform the following actions:
       + rsa_bits                   = 2048
     }
 
-  # tls_self_signed_cert.aws7 will be created
-  + resource "tls_self_signed_cert" "aws7" {
+  # tls_self_signed_cert.aws10 will be created
+  + resource "tls_self_signed_cert" "aws10" {
       + allowed_uses          = [
           + "key_encipherment",
           + "digital_signature",
@@ -1011,7 +1011,7 @@ Terraform will perform the following actions:
         ]
       + cert_pem              = (known after apply)
       + dns_names             = [
-          + "tfe7.anton.hashicorp-success.com",
+          + "tfe10.anton.hashicorp-success.com",
         ]
       + early_renewal_hours   = 744
       + id                    = (known after apply)
@@ -1023,7 +1023,7 @@ Terraform will perform the following actions:
       + validity_start_time   = (known after apply)
 
       + subject {
-          + common_name  = "tfe7.anton.hashicorp-success.com"
+          + common_name  = "tfe10.anton.hashicorp-success.com"
           + organization = "aakulov sandbox"
         }
     }
@@ -1031,7 +1031,7 @@ Terraform will perform the following actions:
 Plan: 25 to add, 0 to change, 0 to destroy.
 
 Changes to Outputs:
-  + aws_url = "tfe7.anton.hashicorp-success.com"
+  + aws_url = "tfe10.anton.hashicorp-success.com"
 
 Do you want to perform these actions?
   Terraform will perform the actions described above.
@@ -1039,23 +1039,23 @@ Do you want to perform these actions?
 
   Enter a value: yes
 
-tls_private_key.aws7: Creating...
-tls_private_key.aws7: Creation complete after 0s [id=42b8301d5b3a0adec852b2a3f49c7396df6d2007]
-tls_self_signed_cert.aws7: Creating...
-tls_self_signed_cert.aws7: Creation complete after 0s [id=287433814863524592732522140055983667632]
-aws_eip.aws7: Creating...
+tls_private_key.aws10: Creating...
+tls_private_key.aws10: Creation complete after 0s [id=42b8301d5b3a0adec852b2a3f49c7396df6d2007]
+tls_self_signed_cert.aws10: Creating...
+tls_self_signed_cert.aws10: Creation complete after 0s [id=287433814863524592732522140055983667632]
+aws_eip.aws10: Creating...
 aws_vpc.vpc: Creating...
-aws_iam_role.aakulov-aws7-iam-role-ec2-s3: Creating...
-aws_s3_bucket.aws7: Creating...
-aws_eip.aws7: Creation complete after 1s [id=eipalloc-091801597e997f58a]
-aws_iam_role.aakulov-aws7-iam-role-ec2-s3: Creation complete after 3s [id=aakulov-aws7-iam-role-ec2-s3]
-aws_iam_instance_profile.aakulov-aws7-ec2-s3: Creating...
-aws_s3_bucket.aws7: Creation complete after 3s [id=aakulov-aws7-tfe-data]
-aws_s3_bucket_public_access_block.aws7: Creating...
-aws_iam_role_policy.aakulov-aws7-ec2-s3: Creating...
-aws_s3_bucket_public_access_block.aws7: Creation complete after 1s [id=aakulov-aws7-tfe-data]
-aws_iam_role_policy.aakulov-aws7-ec2-s3: Creation complete after 2s [id=aakulov-aws7-iam-role-ec2-s3:aakulov-aws7-ec2-s3]
-aws_iam_instance_profile.aakulov-aws7-ec2-s3: Creation complete after 3s [id=aakulov-aws7-ec2-s3]
+aws_iam_role.aakulov-aws10-iam-role-ec2-s3: Creating...
+aws_s3_bucket.aws10: Creating...
+aws_eip.aws10: Creation complete after 1s [id=eipalloc-091801597e997f58a]
+aws_iam_role.aakulov-aws10-iam-role-ec2-s3: Creation complete after 3s [id=aakulov-aws10-iam-role-ec2-s3]
+aws_iam_instance_profile.aakulov-aws10-ec2-s3: Creating...
+aws_s3_bucket.aws10: Creation complete after 3s [id=aakulov-aws10-tfe-data]
+aws_s3_bucket_public_access_block.aws10: Creating...
+aws_iam_role_policy.aakulov-aws10-ec2-s3: Creating...
+aws_s3_bucket_public_access_block.aws10: Creation complete after 1s [id=aakulov-aws10-tfe-data]
+aws_iam_role_policy.aakulov-aws10-ec2-s3: Creation complete after 2s [id=aakulov-aws10-iam-role-ec2-s3:aakulov-aws10-ec2-s3]
+aws_iam_instance_profile.aakulov-aws10-ec2-s3: Creation complete after 3s [id=aakulov-aws10-ec2-s3]
 aws_vpc.vpc: Still creating... [10s elapsed]
 aws_vpc.vpc: Creation complete after 13s [id=vpc-03b654ec47950329c]
 aws_internet_gateway.igw: Creating...
@@ -1063,75 +1063,75 @@ aws_subnet.subnet_private2: Creating...
 aws_subnet.subnet_private1: Creating...
 aws_subnet.subnet_public2: Creating...
 aws_subnet.subnet_public1: Creating...
-aws_security_group.aws7-internal-sg: Creating...
-aws_security_group.aakulov-aws7: Creating...
+aws_security_group.aws10-internal-sg: Creating...
+aws_security_group.aakulov-aws10: Creating...
 aws_internet_gateway.igw: Creation complete after 0s [id=igw-0b107b5f9ceb07c6e]
 aws_subnet.subnet_private1: Creation complete after 0s [id=subnet-0b73fffe142c8a5be]
-aws_route_table.aws7-public: Creating...
+aws_route_table.aws10-public: Creating...
 aws_subnet.subnet_public2: Creation complete after 0s [id=subnet-00fe12afd19b59ffb]
 aws_subnet.subnet_public1: Creation complete after 0s [id=subnet-0be90f409f295238e]
 aws_subnet.subnet_private2: Creation complete after 0s [id=subnet-0141776b624bdc499]
 aws_nat_gateway.nat: Creating...
-aws_db_subnet_group.aws7: Creating...
-aws_route_table.aws7-public: Creation complete after 1s [id=rtb-00351ff5f07a8255b]
-aws_db_subnet_group.aws7: Creation complete after 1s [id=aakulov-aws7]
-aws_route_table_association.aws7-public: Creating...
-aws_security_group.aakulov-aws7: Creation complete after 1s [id=sg-0c61896d869708944]
-aws_security_group.aws7-internal-sg: Creation complete after 1s [id=sg-00b6258815ba6c017]
-aws_db_instance.aws7: Creating...
-aws_route_table_association.aws7-public: Creation complete after 1s [id=rtbassoc-0ad31c6f90b389ea6]
+aws_db_subnet_group.aws10: Creating...
+aws_route_table.aws10-public: Creation complete after 1s [id=rtb-00351ff5f07a8255b]
+aws_db_subnet_group.aws10: Creation complete after 1s [id=aakulov-aws10]
+aws_route_table_association.aws10-public: Creating...
+aws_security_group.aakulov-aws10: Creation complete after 1s [id=sg-0c61896d869708944]
+aws_security_group.aws10-internal-sg: Creation complete after 1s [id=sg-00b6258815ba6c017]
+aws_db_instance.aws10: Creating...
+aws_route_table_association.aws10-public: Creation complete after 1s [id=rtbassoc-0ad31c6f90b389ea6]
 aws_nat_gateway.nat: Still creating... [10s elapsed]
-aws_db_instance.aws7: Still creating... [10s elapsed]
+aws_db_instance.aws10: Still creating... [10s elapsed]
 aws_nat_gateway.nat: Still creating... [20s elapsed]
-aws_db_instance.aws7: Still creating... [20s elapsed]
+aws_db_instance.aws10: Still creating... [20s elapsed]
 aws_nat_gateway.nat: Still creating... [30s elapsed]
-aws_db_instance.aws7: Still creating... [30s elapsed]
+aws_db_instance.aws10: Still creating... [30s elapsed]
 aws_nat_gateway.nat: Still creating... [40s elapsed]
-aws_db_instance.aws7: Still creating... [40s elapsed]
+aws_db_instance.aws10: Still creating... [40s elapsed]
 aws_nat_gateway.nat: Still creating... [50s elapsed]
-aws_db_instance.aws7: Still creating... [50s elapsed]
+aws_db_instance.aws10: Still creating... [50s elapsed]
 aws_nat_gateway.nat: Still creating... [1m0s elapsed]
-aws_db_instance.aws7: Still creating... [1m0s elapsed]
+aws_db_instance.aws10: Still creating... [1m0s elapsed]
 aws_nat_gateway.nat: Still creating... [1m10s elapsed]
-aws_db_instance.aws7: Still creating... [1m10s elapsed]
+aws_db_instance.aws10: Still creating... [1m10s elapsed]
 aws_nat_gateway.nat: Still creating... [1m20s elapsed]
-aws_db_instance.aws7: Still creating... [1m20s elapsed]
+aws_db_instance.aws10: Still creating... [1m20s elapsed]
 aws_nat_gateway.nat: Still creating... [1m30s elapsed]
-aws_db_instance.aws7: Still creating... [1m31s elapsed]
+aws_db_instance.aws10: Still creating... [1m31s elapsed]
 aws_nat_gateway.nat: Still creating... [1m40s elapsed]
-aws_db_instance.aws7: Still creating... [1m41s elapsed]
+aws_db_instance.aws10: Still creating... [1m41s elapsed]
 aws_nat_gateway.nat: Creation complete after 1m46s [id=nat-027b23171181bc45d]
-aws_route_table.aws7-private: Creating...
-aws_route_table.aws7-private: Creation complete after 1s [id=rtb-0b05be12d4db1db82]
-aws_route_table_association.aws7-private: Creating...
-aws_route_table_association.aws7-private: Creation complete after 1s [id=rtbassoc-0356696f2c1e26d4e]
-aws_db_instance.aws7: Still creating... [1m51s elapsed]
-aws_db_instance.aws7: Still creating... [2m1s elapsed]
-aws_db_instance.aws7: Still creating... [2m11s elapsed]
-aws_db_instance.aws7: Still creating... [2m21s elapsed]
-aws_db_instance.aws7: Still creating... [2m31s elapsed]
-aws_db_instance.aws7: Still creating... [2m41s elapsed]
-aws_db_instance.aws7: Still creating... [2m51s elapsed]
-aws_db_instance.aws7: Still creating... [3m1s elapsed]
-aws_db_instance.aws7: Still creating... [3m11s elapsed]
-aws_db_instance.aws7: Creation complete after 3m16s [id=terraform-20211122095341487600000001]
+aws_route_table.aws10-private: Creating...
+aws_route_table.aws10-private: Creation complete after 1s [id=rtb-0b05be12d4db1db82]
+aws_route_table_association.aws10-private: Creating...
+aws_route_table_association.aws10-private: Creation complete after 1s [id=rtbassoc-0356696f2c1e26d4e]
+aws_db_instance.aws10: Still creating... [1m51s elapsed]
+aws_db_instance.aws10: Still creating... [2m1s elapsed]
+aws_db_instance.aws10: Still creating... [2m11s elapsed]
+aws_db_instance.aws10: Still creating... [2m21s elapsed]
+aws_db_instance.aws10: Still creating... [2m31s elapsed]
+aws_db_instance.aws10: Still creating... [2m41s elapsed]
+aws_db_instance.aws10: Still creating... [2m51s elapsed]
+aws_db_instance.aws10: Still creating... [3m1s elapsed]
+aws_db_instance.aws10: Still creating... [3m11s elapsed]
+aws_db_instance.aws10: Creation complete after 3m16s [id=terraform-20211122095341487600000001]
 data.template_file.install_tfe_sh: Reading...
 data.template_file.install_tfe_sh: Read complete after 0s [id=8159b7ef82ca90589a9711d2a5d47c5866c42db319d162267d2f19929be07b4e]
-data.template_cloudinit_config.aws7_cloudinit: Reading...
-data.template_cloudinit_config.aws7_cloudinit: Read complete after 0s [id=2343644157]
-aws_instance.aws7: Creating...
-aws_instance.aws7: Still creating... [10s elapsed]
-aws_instance.aws7: Creation complete after 13s [id=i-092f86289e90c9a76]
-aws_route53_record.aws7: Creating...
-aws_route53_record.aws7: Still creating... [10s elapsed]
-aws_route53_record.aws7: Still creating... [20s elapsed]
-aws_route53_record.aws7: Still creating... [30s elapsed]
-aws_route53_record.aws7: Creation complete after 35s [id=Z077919913NMEBCGB4WS0_tfe7.anton.hashicorp-success.com_A]
+data.template_cloudinit_config.aws10_cloudinit: Reading...
+data.template_cloudinit_config.aws10_cloudinit: Read complete after 0s [id=2343644157]
+aws_instance.aws10: Creating...
+aws_instance.aws10: Still creating... [10s elapsed]
+aws_instance.aws10: Creation complete after 13s [id=i-092f86289e90c9a76]
+aws_route53_record.aws10: Creating...
+aws_route53_record.aws10: Still creating... [10s elapsed]
+aws_route53_record.aws10: Still creating... [20s elapsed]
+aws_route53_record.aws10: Still creating... [30s elapsed]
+aws_route53_record.aws10: Creation complete after 35s [id=Z077919913NMEBCGB4WS0_tfe10.anton.hashicorp-success.com_A]
 
 Apply complete! Resources: 25 added, 0 changed, 0 destroyed.
 
 Outputs:
 
-aws_url = "tfe7.anton.hashicorp-success.com"
+aws_url = "tfe10.anton.hashicorp-success.com"
 
 ```
