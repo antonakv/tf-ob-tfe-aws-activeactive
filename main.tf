@@ -545,11 +545,11 @@ resource "aws_lb_listener" "aws10-8800" {
 
 resource "aws_lb_listener_rule" "aws10-8800" {
   listener_arn = aws_lb_listener.aws10-8800.arn
-   condition {
+  condition {
     host_header {
       values = [var.tfe_hostname]
     }
-  } 
+  }
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.aws10-8800.arn
@@ -558,11 +558,11 @@ resource "aws_lb_listener_rule" "aws10-8800" {
 
 resource "aws_lb_listener_rule" "aws10-443" {
   listener_arn = aws_lb_listener.aws10-443.arn
-   condition {
+  condition {
     host_header {
       values = [var.tfe_hostname]
     }
-  } 
+  }
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.aws10-443.arn
@@ -600,6 +600,21 @@ resource "aws_security_group" "aws10-lb-sg" {
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "aws10-redis-sg" {
+  vpc_id = aws_vpc.vpc.id
+  name   = "aakulov-aws10-redis-sg"
+  tags = {
+    Name = "aakulov-aws10-redis-sg"
+  }
+
+  ingress {
+    from_port       = 7480
+    to_port         = 7480
+    protocol        = "tcp"
+    security_groups = [aws_security_group.aws10-internal-sg.id]
   }
 }
 
@@ -677,9 +692,36 @@ resource "aws_iam_role" "aakulov-aws10-iam-role-ec2-s3" {
   }
 }
 
+resource "aws_elasticache_subnet_group" "aws10" {
+  name       = "aakulov-aws10"
+  subnet_ids = [aws_subnet.subnet_private1.id, aws_subnet.subnet_private2.id]
+}
+
+resource "aws_elasticache_replication_group" "aws10" {
+  node_type                  = var.instance_type_redis
+  replication_group_id       = "aakulov-aws10"
+  description                = "aakulov-aws10"
+  apply_immediately          = true
+  at_rest_encryption_enabled = true
+  auth_token                 = var.redis_token
+  automatic_failover_enabled = true
+  availability_zones         = ["eu-central-1b", "eu-central-1c"]
+  engine                     = "redis"
+  engine_version             = "5.0.6"
+  num_cache_clusters         = 2
+  parameter_group_name       = "default.redis5.0"
+  port                       = 7480
+  security_group_ids         = [aws_security_group.aws10-redis-sg.id]
+  subnet_group_name          = aws_elasticache_subnet_group.aws10.name
+  transit_encryption_enabled = true
+}
 
 output "aws_jump" {
   value = aws_route53_record.aws10jump.name
+}
+
+output "tfe_instance_private_ip" {
+  value = aws_instance.aws10.private_ip
 }
 
 output "aws_url" {
