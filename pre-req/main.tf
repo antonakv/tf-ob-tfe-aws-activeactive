@@ -4,7 +4,6 @@ provider "aws" {
 
 resource "aws_s3_bucket" "aws10-tfe" {
   bucket = "aakulov-aws10-tfe-tfe"
-  acl    = "private"
   force_destroy = true
   tags = {
     Name = "aakulov-aws10-tfe-tfe"
