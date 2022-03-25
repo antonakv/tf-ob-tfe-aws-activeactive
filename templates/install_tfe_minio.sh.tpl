@@ -169,7 +169,35 @@ echo "#!/usr/bin/env bash
     sleep 5
   done
   date
+  sudo /usr/bin/bash /home/ubuntu/install/create_admin_user.sh > /home/ubuntu/install/admin_token.txt
+  date
 " > /home/ubuntu/install/healthcheck.sh
+
+echo "#!/usr/bin/env bash
+while ! INITIAL_TOKEN=$(replicated admin --tty=0 retrieve-iact); do
+  sleep 5
+done
+
+ADMIN_POST_DATA=$(cat <<EOF
+{
+  \"username\": \"${tfe_admin_username}\",
+  \"email\": \"${tfe_admin_email}\",
+  \"password\": \"${tfe_admin_password}\"
+}
+EOF
+);
+
+ADMIN_TOKEN_RESPONSE=$(curl -sSLk \
+  --request POST \
+  -H \"Content-Type: application/json\" \
+  --data $ADMIN_POST_DATA \
+  https:///${tfe_hostname}/admin/initial-admin-user?token=$INITIAL_TOKEN \
+  | jq '.'
+);
+
+export ADMIN_TOKEN=$(echo \"$ADMIN_TOKEN_RESPONSE\" | jq '.token' | tr -d '\"');
+echo \"$ADMIN_TOKEN\"
+" > /home/ubuntu/install/create_admin_user.sh
 
 echo "{
   \"debug\": true

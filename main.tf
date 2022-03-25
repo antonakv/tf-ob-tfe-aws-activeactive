@@ -264,22 +264,21 @@ resource "aws_security_group" "aws10-public-sg" {
 
 
 resource "aws_route53_record" "aws10" {
-  zone_id         = "Z077919913NMEBCGB4WS0"
-  name            = var.tfe_hostname
-  type            = "CNAME"
-  ttl             = "300"
-  records         = [aws_lb.aws10.dns_name]
-  allow_overwrite = true
+  zone_id    = "Z077919913NMEBCGB4WS0"
+  name       = var.tfe_hostname
+  type       = "CNAME"
+  ttl        = "300"
+  records    = [aws_lb.aws10.dns_name]
+  depends_on = [aws_lb.aws10]
 }
 
 resource "aws_route53_record" "aws10jump" {
-  zone_id         = "Z077919913NMEBCGB4WS0"
-  name            = var.tfe_hostname_jump
-  type            = "A"
-  ttl             = "300"
-  records         = [aws_instance.aws10jump.public_ip]
-  allow_overwrite = true
-  depends_on      = [aws_instance.aws10jump]
+  zone_id    = "Z077919913NMEBCGB4WS0"
+  name       = var.tfe_hostname_jump
+  type       = "CNAME"
+  ttl        = "300"
+  records    = [aws_instance.aws10jump.public_dns]
+  depends_on = [aws_instance.aws10jump]
 }
 
 resource "aws_route53_record" "cert_validation" {
@@ -363,19 +362,23 @@ resource "aws_instance" "aws10_minio" {
 data "template_file" "install_tfe_minio_sh" {
   template = file("templates/install_tfe_minio.sh.tpl")
   vars = {
-    enc_password     = var.enc_password
-    hostname         = var.tfe_hostname
-    release_sequence = var.release_sequence
-    pgsqlhostname    = aws_db_instance.aws10.address
-    pgsqlpassword    = var.db_password
-    pguser           = aws_db_instance.aws10.username
-    s3bucket         = var.s3_bucket
-    s3region         = var.region
-    cert_pem         = tls_self_signed_cert.aws10.cert_pem
-    key_pem          = tls_private_key.aws10.private_key_pem
-    minio_secret_key = var.minio_secret_key
-    minio_access_key = var.minio_access_key
-    s3endpoint       = local.s3endpoint
+    enc_password       = var.enc_password
+    hostname           = var.tfe_hostname
+    release_sequence   = var.release_sequence
+    pgsqlhostname      = aws_db_instance.aws10.address
+    pgsqlpassword      = var.db_password
+    pguser             = aws_db_instance.aws10.username
+    s3bucket           = var.s3_bucket
+    s3region           = var.region
+    cert_pem           = tls_self_signed_cert.aws10.cert_pem
+    key_pem            = tls_private_key.aws10.private_key_pem
+    minio_secret_key   = var.minio_secret_key
+    minio_access_key   = var.minio_access_key
+    s3endpoint         = local.s3endpoint
+    tfe_admin_username = var.tfe_admin_username
+    tfe_admin_password = var.tfe_admin_password
+    tfe_admin_email    = var.tfe_admin_email
+    tfe_hostname       = var.tfe_hostname
   }
 }
 
@@ -400,7 +403,7 @@ resource "aws_instance" "aws10" {
   user_data                   = data.template_cloudinit_config.aws10_cloudinit.rendered
   iam_instance_profile        = aws_iam_instance_profile.aakulov-aws10-ec2-s3.id
   depends_on = [
-    aws_instance.aws10_minio
+    aws_instance.aws10_minio, aws_elasticache_replication_group.aws10, aws_db_instance.aws10
   ]
   metadata_options {
     http_tokens                 = "required"
@@ -717,7 +720,7 @@ resource "aws_elasticache_replication_group" "aws10" {
 }
 
 output "aws_jump" {
-  value = aws_route53_record.aws10jump.name
+  value = aws_route53_record.aws10jump.fqdn
 }
 
 output "tfe_instance_private_ip" {

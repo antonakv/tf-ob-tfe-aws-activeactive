@@ -80,3 +80,15 @@ variable "redis_token" {
   type        = string
   description = "Redis token"
 }
+
+variable "tfe_admin_username" {
+  description = "Admin username"
+}
+
+variable "tfe_admin_password" {
+  description = "Admin password"
+}
+
+variable "tfe_admin_email" {
+  description = "Admin email"
+}

@@ -50,7 +50,7 @@ cd tf-ob-tfe-aws-activeactive
 
 ```
 key_name            = "aakulov"
-ami                 = "ami-086128e34136c3375"
+ami                 = "ami-04cc8853bc63ad07d"
 instance_type       = "t3.2xlarge"
 db_instance_type    = "db.t3.medium"
 region              = "eu-central-1"
