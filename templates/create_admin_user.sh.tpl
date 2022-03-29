@@ -7,9 +7,9 @@ ADMIN_EMAIL="${tfe_admin_email}"
 TFE_HOSTNAME="${tfe_hostname}"
 ADMIN_POST_DATA=$(cat <<EOF
 {
-  "username": "${ADMIN_USERNAME}",
-  "email": "${ADMIN_EMAIL}",
-  "password": "${ADMIN_PASSWORD}"
+  "username": "$ADMIN_USERNAME",
+  "email": "$ADMIN_EMAIL",
+  "password": "$ADMIN_PASSWORD"
 }
 EOF
 );

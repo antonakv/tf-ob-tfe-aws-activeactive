@@ -1,6 +1,8 @@
 locals {
   s3endpoint      = format("http://%s:9000", aws_instance.aws10_minio.private_ip)
   s3endpointlocal = "http://127.0.0.1:9000"
+  tfe_hostname = format("%s%s", random_pet.dnsid.id, var.tfe_hostname)
+  tfe_hostname_jump = format("%s%s", random_pet.dnsid.id, var.tfe_hostname_jump)
 }
 
 provider "aws" {
@@ -262,6 +264,9 @@ resource "aws_security_group" "aws10-public-sg" {
   }
 }
 
+resource "random_pet" "dnsid" {
+  length = 1
+}
 
 resource "aws_route53_record" "aws10" {
   zone_id    = "Z077919913NMEBCGB4WS0"
@@ -403,7 +408,7 @@ resource "aws_instance" "aws10" {
   user_data                   = data.template_cloudinit_config.aws10_cloudinit.rendered
   iam_instance_profile        = aws_iam_instance_profile.aakulov-aws10-ec2-s3.id
   depends_on = [
-    aws_instance.aws10_minio, aws_elasticache_replication_group.aws10, aws_db_instance.aws10
+    aws_instance.aws10jump, aws_instance.aws10_minio, aws_elasticache_replication_group.aws10, aws_db_instance.aws10
   ]
   metadata_options {
     http_tokens                 = "required"
@@ -718,6 +723,10 @@ resource "aws_elasticache_replication_group" "aws10" {
   subnet_group_name          = aws_elasticache_subnet_group.aws10.name
   transit_encryption_enabled = true
 }
+
+/* output "data_template" {
+  value = data.template_file.install_tfe_minio_sh.rendered
+} */
 
 output "aws_jump" {
   value = aws_route53_record.aws10jump.fqdn
