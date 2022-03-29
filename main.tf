@@ -1,6 +1,8 @@
 locals {
   s3endpoint      = format("http://%s:9000", aws_instance.aws10_minio.private_ip)
   s3endpointlocal = "http://127.0.0.1:9000"
+  tfe_hostname = format("%s%s", random_pet.dnsid.id, var.tfe_hostname)
+  tfe_hostname_jump = format("%s%s", random_pet.dnsid.id, var.tfe_hostname_jump)
 }
 
 provider "aws" {
@@ -262,24 +264,26 @@ resource "aws_security_group" "aws10-public-sg" {
   }
 }
 
+resource "random_pet" "dnsid" {
+  length = 1
+}
 
 resource "aws_route53_record" "aws10" {
-  zone_id         = "Z077919913NMEBCGB4WS0"
-  name            = var.tfe_hostname
-  type            = "CNAME"
-  ttl             = "300"
-  records         = [aws_lb.aws10.dns_name]
-  allow_overwrite = true
+  zone_id    = "Z077919913NMEBCGB4WS0"
+  name       = var.tfe_hostname
+  type       = "CNAME"
+  ttl        = "300"
+  records    = [aws_lb.aws10.dns_name]
+  depends_on = [aws_lb.aws10]
 }
 
 resource "aws_route53_record" "aws10jump" {
-  zone_id         = "Z077919913NMEBCGB4WS0"
-  name            = var.tfe_hostname_jump
-  type            = "A"
-  ttl             = "300"
-  records         = [aws_instance.aws10jump.public_ip]
-  allow_overwrite = true
-  depends_on      = [aws_instance.aws10jump]
+  zone_id    = "Z077919913NMEBCGB4WS0"
+  name       = var.tfe_hostname_jump
+  type       = "CNAME"
+  ttl        = "300"
+  records    = [aws_instance.aws10jump.public_dns]
+  depends_on = [aws_instance.aws10jump]
 }
 
 resource "aws_route53_record" "cert_validation" {
@@ -363,19 +367,23 @@ resource "aws_instance" "aws10_minio" {
 data "template_file" "install_tfe_minio_sh" {
   template = file("templates/install_tfe_minio.sh.tpl")
   vars = {
-    enc_password     = var.enc_password
-    hostname         = var.tfe_hostname
-    release_sequence = var.release_sequence
-    pgsqlhostname    = aws_db_instance.aws10.address
-    pgsqlpassword    = var.db_password
-    pguser           = aws_db_instance.aws10.username
-    s3bucket         = var.s3_bucket
-    s3region         = var.region
-    cert_pem         = tls_self_signed_cert.aws10.cert_pem
-    key_pem          = tls_private_key.aws10.private_key_pem
-    minio_secret_key = var.minio_secret_key
-    minio_access_key = var.minio_access_key
-    s3endpoint       = local.s3endpoint
+    enc_password       = var.enc_password
+    hostname           = var.tfe_hostname
+    release_sequence   = var.release_sequence
+    pgsqlhostname      = aws_db_instance.aws10.address
+    pgsqlpassword      = var.db_password
+    pguser             = aws_db_instance.aws10.username
+    s3bucket           = var.s3_bucket
+    s3region           = var.region
+    cert_pem           = tls_self_signed_cert.aws10.cert_pem
+    key_pem            = tls_private_key.aws10.private_key_pem
+    minio_secret_key   = var.minio_secret_key
+    minio_access_key   = var.minio_access_key
+    s3endpoint         = local.s3endpoint
+    tfe_admin_username = var.tfe_admin_username
+    tfe_admin_password = var.tfe_admin_password
+    tfe_admin_email    = var.tfe_admin_email
+    tfe_hostname       = var.tfe_hostname
   }
 }
 
@@ -400,7 +408,7 @@ resource "aws_instance" "aws10" {
   user_data                   = data.template_cloudinit_config.aws10_cloudinit.rendered
   iam_instance_profile        = aws_iam_instance_profile.aakulov-aws10-ec2-s3.id
   depends_on = [
-    aws_instance.aws10_minio
+    aws_instance.aws10jump, aws_instance.aws10_minio, aws_elasticache_replication_group.aws10, aws_db_instance.aws10
   ]
   metadata_options {
     http_tokens                 = "required"
@@ -545,11 +553,11 @@ resource "aws_lb_listener" "aws10-8800" {
 
 resource "aws_lb_listener_rule" "aws10-8800" {
   listener_arn = aws_lb_listener.aws10-8800.arn
-   condition {
+  condition {
     host_header {
       values = [var.tfe_hostname]
     }
-  } 
+  }
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.aws10-8800.arn
@@ -558,11 +566,11 @@ resource "aws_lb_listener_rule" "aws10-8800" {
 
 resource "aws_lb_listener_rule" "aws10-443" {
   listener_arn = aws_lb_listener.aws10-443.arn
-   condition {
+  condition {
     host_header {
       values = [var.tfe_hostname]
     }
-  } 
+  }
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.aws10-443.arn
@@ -600,6 +608,21 @@ resource "aws_security_group" "aws10-lb-sg" {
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "aws10-redis-sg" {
+  vpc_id = aws_vpc.vpc.id
+  name   = "aakulov-aws10-redis-sg"
+  tags = {
+    Name = "aakulov-aws10-redis-sg"
+  }
+
+  ingress {
+    from_port       = 7480
+    to_port         = 7480
+    protocol        = "tcp"
+    security_groups = [aws_security_group.aws10-internal-sg.id]
   }
 }
 
@@ -677,9 +700,40 @@ resource "aws_iam_role" "aakulov-aws10-iam-role-ec2-s3" {
   }
 }
 
+resource "aws_elasticache_subnet_group" "aws10" {
+  name       = "aakulov-aws10"
+  subnet_ids = [aws_subnet.subnet_private1.id, aws_subnet.subnet_private2.id]
+}
+
+resource "aws_elasticache_replication_group" "aws10" {
+  node_type                  = var.instance_type_redis
+  replication_group_id       = "aakulov-aws10"
+  description                = "aakulov-aws10"
+  apply_immediately          = true
+  at_rest_encryption_enabled = true
+  auth_token                 = var.redis_token
+  automatic_failover_enabled = true
+  availability_zones         = ["eu-central-1b", "eu-central-1c"]
+  engine                     = "redis"
+  engine_version             = "5.0.6"
+  num_cache_clusters         = 2
+  parameter_group_name       = "default.redis5.0"
+  port                       = 7480
+  security_group_ids         = [aws_security_group.aws10-redis-sg.id]
+  subnet_group_name          = aws_elasticache_subnet_group.aws10.name
+  transit_encryption_enabled = true
+}
+
+/* output "data_template" {
+  value = data.template_file.install_tfe_minio_sh.rendered
+} */
 
 output "aws_jump" {
-  value = aws_route53_record.aws10jump.name
+  value = aws_route53_record.aws10jump.fqdn
+}
+
+output "tfe_instance_private_ip" {
+  value = aws_instance.aws10.private_ip
 }
 
 output "aws_url" {

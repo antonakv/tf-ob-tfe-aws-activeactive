@@ -68,6 +68,27 @@ variable "instance_type_minio" {
 variable "instance_type_jump" {
   description = "Amazon EC2 Jump host instance type"
 }
+
+variable "instance_type_redis" {
+  description = "Amazon Elasticashe Redis instance type"
+}
+
 variable "s3_bucket" {
   description = "Name of the Terraform Enterprise S3 bucket"
+}
+variable "redis_token" {
+  type        = string
+  description = "Redis token"
+}
+
+variable "tfe_admin_username" {
+  description = "Admin username"
+}
+
+variable "tfe_admin_password" {
+  description = "Admin password"
+}
+
+variable "tfe_admin_email" {
+  description = "Admin email"
 }
