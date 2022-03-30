@@ -76,14 +76,29 @@ resource "aws_internet_gateway" "igw" {
 
 resource "aws_eip" "aws10" {
   vpc = true
+  instance = aws_instance.aws10.id
+  depends_on = [
+    aws_internet_gateway.igw
+  ]
 }
 
 resource "aws_eip" "aws10jump" {
   vpc = true
+  instance = aws_instance.aws10jump.id
+  depends_on = [
+    aws_internet_gateway.igw
+  ]
+}
+
+resource "aws_eip" "aws10nat" {
+  vpc = true
+  depends_on = [
+    aws_internet_gateway.igw
+  ]
 }
 
 resource "aws_nat_gateway" "nat" {
-  allocation_id = aws_eip.aws10.id
+  allocation_id = aws_eip.aws10nat.id
   subnet_id     = aws_subnet.subnet_public1.id
   depends_on    = [aws_internet_gateway.igw]
   tags = {
@@ -280,10 +295,10 @@ resource "aws_route53_record" "aws10" {
 resource "aws_route53_record" "aws10jump" {
   zone_id    = "Z077919913NMEBCGB4WS0"
   name       = var.tfe_hostname_jump
-  type       = "CNAME"
+  type       = "A"
   ttl        = "300"
-  records    = [aws_instance.aws10jump.public_dns]
-  depends_on = [aws_instance.aws10jump]
+  records    = [aws_eip.aws10jump.public_ip]
+  depends_on = [aws_instance.aws10jump, aws_eip.aws10jump]
 }
 
 resource "aws_route53_record" "cert_validation" {
@@ -423,6 +438,11 @@ resource "aws_instance" "aws10" {
 resource "aws_eip_association" "aws10jump" {
   instance_id   = aws_instance.aws10jump.id
   allocation_id = aws_eip.aws10jump.id
+}
+
+resource "aws_eip_association" "aws10" {
+  instance_id   = aws_instance.aws10.id
+  allocation_id = aws_eip.aws10.id
 }
 
 resource "aws_instance" "aws10jump" {
