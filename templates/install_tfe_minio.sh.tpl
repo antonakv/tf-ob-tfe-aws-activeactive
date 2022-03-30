@@ -179,12 +179,12 @@ while [ -z \$INITIAL_TOKEN ]; do
   INITIAL_TOKEN=\$(replicated admin --tty=0 retrieve-iact)
 done
 
-ADMIN_POST_DATA=$(cat <<EOF
+ADMIN_POST_DATA=\"\$(cat <<EOF
 {
   "username": "${tfe_admin_username}",
   "email": "${tfe_admin_email}",
   "password": "${tfe_admin_password}"
-}
+}\"
 EOF
 );
 
