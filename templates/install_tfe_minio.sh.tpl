@@ -156,7 +156,7 @@ aws configure set aws_secret_access_key ${minio_secret_key}
 
 aws s3api create-bucket --acl private --bucket ${s3bucket}  --endpoint-url ${s3endpoint}
 aws s3 ls s3://${s3bucket}  --endpoint-url ${s3endpoint}
-
+sudo hostnamectl set-hostname ${hostname}
 yes | sudo /usr/bin/bash /home/ubuntu/install/install.sh no-proxy private-address=$IPADDR public-address=$IPADDR
 exit 0
 " > /home/ubuntu/install/install_tfe.sh
@@ -169,7 +169,7 @@ echo "#!/usr/bin/env bash
     sleep 5
   done
   date
-  sudo /usr/bin/bash /home/ubuntu/install/create_admin_user.sh > /home/ubuntu/install/admin_token.txt
+  # sudo /home/ubuntu/install/create_admin_user.sh 
   date
 " > /home/ubuntu/install/healthcheck.sh
 
@@ -179,25 +179,25 @@ while [ -z \$INITIAL_TOKEN ]; do
   INITIAL_TOKEN=\$(replicated admin --tty=0 retrieve-iact)
 done
 
-ADMIN_POST_DATA=\"\$(cat <<EOF
+ADMIN_POST_DATA=\$(cat <<EOF
 {
-  "username": "${tfe_admin_username}",
-  "email": "${tfe_admin_email}",
-  "password": "${tfe_admin_password}"
-}\"
+  \"username\": \"${tfe_admin_username}\",
+  \"email\": \"${tfe_admin_email}\",
+  \"password\": \"${tfe_admin_password}\"
+}
 EOF
 );
 
-ADMIN_TOKEN_RESPONSE=\$(curl -sSLk \
-  --request POST \
-  -H \"Content-Type: application/json\" \
-  --data \$ADMIN_POST_DATA \
-  https:///${tfe_hostname}/admin/initial-admin-user?token=\$INITIAL_TOKEN \
+ADMIN_TOKEN_RESPONSE=\$(curl -sSLk \\
+  --request POST \\
+  -H \"Content-Type: application/json\" \\
+  --data \"\$ADMIN_POST_DATA\" \\
+  https://${tfe_hostname}/admin/initial-admin-user?token=\$INITIAL_TOKEN \\
   | jq '.'
 );
 
 ADMIN_TOKEN=\$(printf \"%s\" \$ADMIN_TOKEN_RESPONSE | jq '.token' | tr -d '\"');
-printf \"%s\" \$ADMIN_TOKEN
+printf \"%s\" \$ADMIN_TOKEN >> /home/ubuntu/install/admin_token.txt
 " > /home/ubuntu/install/create_admin_user.sh
 
 echo "{
@@ -209,6 +209,7 @@ sudo cp /home/ubuntu/install/daemon.json /etc/docker/deamon.json
 
 chmod +x /home/ubuntu/install/install_tfe.sh
 chmod +x /home/ubuntu/install/healthcheck.sh
+chmod +x /home/ubuntu/install/create_admin_user.sh
 
 sh /home/ubuntu/install/healthcheck.sh &> /home/ubuntu/install/hc_tfe.log &
 
